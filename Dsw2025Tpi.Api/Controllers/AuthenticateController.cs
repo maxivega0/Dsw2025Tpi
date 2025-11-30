@@ -24,7 +24,7 @@ namespace Dsw2025Tpi.Api.Controllers
         {
             var data = await _authenticateService.Login(request);
 
-            var userNormalized = new { data.User.UserName, data.Role };
+            var userNormalized = new { username = data.User.UserName, role = data.Role.Name };
 
             return Ok( new {token = data.Token, user = userNormalized});
 
@@ -36,7 +36,7 @@ namespace Dsw2025Tpi.Api.Controllers
         {
             var data = await _authenticateService.Register(request);
 
-            var userNormalized = new { data.User.UserName, data.Role };
+            var userNormalized = new { username = data.User.UserName, role = data.Role.Name };
 
             return Ok(new { token = data.Token, user = userNormalized });
 

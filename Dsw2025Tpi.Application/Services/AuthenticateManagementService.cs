@@ -47,7 +47,7 @@ namespace Dsw2025Tpi.Application.Services
             
             var token = _jwtTokenService.GenerateToken(user.UserName, role.Name); 
 
-            return new LoginResponse( Token: token, User: user, Role: role );
+            return new LoginResponse(Token: token, User: user, Role: role );
         }
 
         public async Task<RegisterResponse> Register(RegisterModel request)
