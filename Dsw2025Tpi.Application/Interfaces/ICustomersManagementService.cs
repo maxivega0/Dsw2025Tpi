@@ -1,4 +1,5 @@
 ﻿using Dsw2025Tpi.Application.Dtos;
+using Dsw2025Tpi.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,5 +12,6 @@ namespace Dsw2025Tpi.Application.Interfaces
     {
         Task<CustomerModel.CustomerResponse?> GetCustomerById(Guid id);
         Task<CustomerModel.CustomerResponse> CreateCustomer(CustomerModel.CreateCustomerRequest request);
+        Task<Customer?> GetCustomerByUserId(string userId);
     }
 }

@@ -3,6 +3,7 @@ using Dsw2025Tpi.Application.Exceptions;
 using Dsw2025Tpi.Application.Interfaces;
 using Dsw2025Tpi.Domain.Entities;
 using Dsw2025Tpi.Domain.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,9 +15,16 @@ namespace Dsw2025Tpi.Application.Services
     public class OrdersManagementService : IOrdersManagementService
     {
         public readonly IRepository _orderRepository;
-        public OrdersManagementService(IRepository orderRepository)
+        private readonly ICustomersManagementService _customersManagementService;
+        private readonly UserManager<IdentityUser> _userManager;
+
+        public OrdersManagementService(IRepository orderRepository, 
+            ICustomersManagementService customersManagementService, 
+            UserManager<IdentityUser> userManager)
         {
             _orderRepository = orderRepository;
+            _customersManagementService = customersManagementService;
+            _userManager = userManager;
         }
 
         public async Task<IEnumerable<OrderModel.GetResponse>?> GetOrders()
@@ -67,8 +75,10 @@ namespace Dsw2025Tpi.Application.Services
             //if (string.IsNullOrWhiteSpace(request.BillingAddress)) throw new ArgumentException("La dirección de facturación no puede estar vacía.");
             if (request.OrderItems == null || !request.OrderItems.Any()) throw new ArgumentException("La orden debe contener al menos un producto.");
 
-            var customer = await _orderRepository.GetById<Customer>(request.CustomerId);
-            if (customer == null) throw new EntityNotFoundException($"No existe un cliente con el ID {request.CustomerId}");
+            var user = await _userManager.FindByNameAsync(request.ClientUsername);
+
+            var customer = await _customersManagementService.GetCustomerByUserId(user.Id);
+            if (customer == null) throw new EntityNotFoundException($"No existe un cliente con el ID {customer.Id}");
 
             var duplicateProductIds = request.OrderItems.GroupBy(x => x.ProductId).Where(g => g.Count() > 1).Select(g => g.Key);
             if (duplicateProductIds.Any()) throw new DuplicatedEntityException("La orden contiene productos duplicados");
@@ -97,14 +107,14 @@ namespace Dsw2025Tpi.Application.Services
                 await _orderRepository.Update(product);
             }
 
-            var order = new Order(request.CustomerId/*, request.ShippingAddress, request.BillingAddress*/);
+            var order = new Order(customer.Id/*, request.ShippingAddress, request.BillingAddress*/);
             order.OrderItems = request.OrderItems.Select(item => new OrderItem(item.ProductId, item.Quantity, item.UnitPrice)).ToList();
             var createdOrder = await _orderRepository.Add(order);
             return new OrderModel.AddResponse(
                 createdOrder.Id,
                 createdOrder.CustomerId,
-                createdOrder.ShippingAddress,
-                createdOrder.BillingAddress,
+                //createdOrder.ShippingAddress,
+                //createdOrder.BillingAddress,
                 createdOrder.TotalAmount,
                 createdOrder.Date,
                 createdOrder.OrderItems);

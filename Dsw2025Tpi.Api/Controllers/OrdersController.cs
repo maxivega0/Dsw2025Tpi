@@ -39,10 +39,8 @@ public class OrdersController : ControllerBase
     [HttpPost()]
     public async Task<IActionResult> CreateOrder([FromBody] OrderModel.OrderRequest request)
     {
-
-            var order = await _service.CreateOrder(request);
-            return Ok(order);
-       
+        var order = await _service.CreateOrder(request);
+        return Ok(order);
     }
 
 }
