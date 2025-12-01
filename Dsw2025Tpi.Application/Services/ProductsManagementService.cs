@@ -40,6 +40,36 @@ namespace Dsw2025Tpi.Application.Services
 
         public async Task<ProductModel.PaginationResponse> GetProducts(ProductModel.FilterProductRequest request)
         {
+            var isActive = true;
+
+            var activeProducts = await _productRepository.GetFiltered<Product>(p => (
+                (isActive == null || p.IsActive == isActive)
+                && (string.IsNullOrEmpty(request.Search) || p.Name.Contains(request.Search))
+                ));
+
+
+            var products = activeProducts
+                 .Select(p => new ProductModel.ProductResponse(
+                     p.Id,
+                     p.Sku,
+                     p.InternalCode,
+                     p.Name,
+                     p.Description,
+                     p.CurrentUnitPrice,
+                     p.StockQuantity,
+                     p.IsActive
+                 ))
+                 .OrderBy(p => p.Sku)
+                 .Skip((request.PageNumber - 1) * request.PageSize ?? 0)
+                 .Take(request.PageSize ?? activeProducts.Count());
+
+
+            return new ProductModel.PaginationResponse(products.ToList(), activeProducts.Count());
+
+        }
+
+        public async Task<ProductModel.PaginationResponse> GetAuthProducts(ProductModel.FilterProductRequest request)
+        {
             var isActive = request.Status == "enabled" 
                 ? (bool?)true 
                 : request.Status == "disabled" 
@@ -48,12 +78,8 @@ namespace Dsw2025Tpi.Application.Services
 
             var activeProducts = await _productRepository.GetFiltered<Product>(p =>(
                 (isActive == null || p.IsActive == isActive)
-                && string.IsNullOrEmpty(request.Search) || p.Name.Contains(request.Search))
-                );
-
-
-            if (activeProducts is null || !activeProducts.Any())
-                throw new NoContentException("No se encontraron productos");
+                && (string.IsNullOrEmpty(request.Search) || p.Name.Contains(request.Search))
+                ));
 
             var products = activeProducts
                  .Select(p => new ProductModel.ProductResponse(

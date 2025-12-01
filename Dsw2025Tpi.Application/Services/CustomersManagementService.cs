@@ -20,6 +20,18 @@ namespace Dsw2025Tpi.Application.Services
             _customerRepository = customerRepository;
         }
 
+        public async Task<IEnumerable<CustomerModel.CustomerResponse>> GetCustomers()
+        {
+            var customers = await _customerRepository.GetAll<Customer>();
+
+            return customers.Select(c => new CustomerModel.CustomerResponse(
+                     c.Id,
+                     c.Name,
+                     c.Email,
+                     c.UserId
+                 ));
+        }
+
         public async Task<CustomerModel.CustomerResponse?> GetCustomerById(Guid id)
         {
             var customer = await _customerRepository.GetById<Customer>(id);

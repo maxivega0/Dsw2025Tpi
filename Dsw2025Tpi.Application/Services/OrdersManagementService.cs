@@ -27,37 +27,81 @@ namespace Dsw2025Tpi.Application.Services
             _userManager = userManager;
         }
 
-        public async Task<IEnumerable<OrderModel.GetResponse>?> GetOrders()
+        public async Task<OrderModel.PaginationResponse?> GetOrders(OrderModel.FilterOrderRequest request)
         {
-            var orders = await _orderRepository.GetAll<Order>($"{nameof(Order.OrderItems)}.{nameof(OrderItem.Product)}");
-            return orders?.Select(o => new OrderModel.GetResponse(
-                o.Id,
-                o.CustomerId,
-                //o.ShippingAddress,
-                //o.BillingAddress,
-                o.TotalAmount,
-                o.Date,
-                o.OrderItems.Select(item => new OrderItemModel.Response(
-                    item.ProductId,
-                    item.Product.Name,
-                    item.Quantity,
-                    item.UnitPrice,
-                    item.Subtotal))
-                .ToList()
-            ));
+            var isActive = request.Status == "enabled"
+                ? (bool?)true
+                : request.Status == "disabled"
+                ? (bool?)false
+                : null;
+
+            var orders = await _orderRepository.GetFiltered<Order>(o => (
+                (isActive == null || o.IsActive == isActive)), $"{nameof(Order.OrderItems)}.{nameof(OrderItem.Product)}");
+
+            if (orders == null)
+                return null;
+
+            var customers = await _customersManagementService.GetCustomers();
+
+            // Combinar datos + filtrar en memoria
+            var filtered = orders
+                .Select(o =>
+                {
+                    var customer = customers.FirstOrDefault(c => c.Id == o.CustomerId);
+
+                    return new
+                    {
+                        Order = o,
+                        CustomerName = customer?.Name ?? ""
+                    };
+                })
+                .Where(x =>
+                    string.IsNullOrEmpty(request.Search)
+                    || x.CustomerName.Contains(request.Search, StringComparison.OrdinalIgnoreCase)
+                );
+
+            var finalList = filtered
+             .Select(x => new OrderModel.OrderResponse(
+                 x.Order.Id,
+                 x.Order.CustomerId,
+                 x.CustomerName,
+                 x.Order.TotalAmount,
+                 x.Order.Date,
+                 x.Order.Status.ToString(),
+                 x.Order.IsActive,
+                 x.Order.OrderItems.Select(item => new OrderItemModel.Response(
+                     item.ProductId,
+                     item.Product.Name,
+                     item.Quantity,
+                     item.UnitPrice,
+                     item.Subtotal))
+                 .ToList()
+             ));
+
+            var paged = finalList.OrderBy(o => o.Id)
+            .Skip((request.PageNumber - 1) * (request.PageSize ?? 20))
+            .Take(request.PageSize ?? 20)
+            .ToList();
+
+            return new OrderModel.PaginationResponse(paged, finalList.Count());
         }
 
-        public async Task<OrderModel.GetResponse?> GetOrderById(Guid id)
+        public async Task<OrderModel.OrderResponse?> GetOrderById(Guid id)
         {
             var order = await _orderRepository.GetById<Order>(id, $"{nameof(Order.OrderItems)}.{nameof(OrderItem.Product)}");
+            var customer = await _customersManagementService.GetCustomerById(order.CustomerId);
+            
             return order != null ?
-                new OrderModel.GetResponse(
+                new OrderModel.OrderResponse(
                     order.Id,
                     order.CustomerId,
+                    customer?.Name,
                     //order.ShippingAddress,
                     //order.BillingAddress,
                     order.TotalAmount,
                     order.Date,
+                    order.Status.ToString(),
+                    order.IsActive,
                     order.OrderItems.Select(item => new OrderItemModel.Response(
                         item.ProductId,
                         item.Product.Name,
@@ -69,7 +113,7 @@ namespace Dsw2025Tpi.Application.Services
                 null;
         }
 
-        public async Task<OrderModel.AddResponse?> CreateOrder(OrderModel.OrderRequest request)
+        public async Task<OrderModel.CreateResponse?> CreateOrder(OrderModel.OrderRequest request)
         {
             //if (string.IsNullOrWhiteSpace(request.ShippingAddress)) throw new ArgumentException("La dirección de envío no puede estar vacía.");
             //if (string.IsNullOrWhiteSpace(request.BillingAddress)) throw new ArgumentException("La dirección de facturación no puede estar vacía.");
@@ -110,13 +154,14 @@ namespace Dsw2025Tpi.Application.Services
             var order = new Order(customer.Id/*, request.ShippingAddress, request.BillingAddress*/);
             order.OrderItems = request.OrderItems.Select(item => new OrderItem(item.ProductId, item.Quantity, item.UnitPrice)).ToList();
             var createdOrder = await _orderRepository.Add(order);
-            return new OrderModel.AddResponse(
+            return new OrderModel.CreateResponse(
                 createdOrder.Id,
                 createdOrder.CustomerId,
                 //createdOrder.ShippingAddress,
                 //createdOrder.BillingAddress,
                 createdOrder.TotalAmount,
                 createdOrder.Date,
+                createdOrder.Status,
                 createdOrder.OrderItems);
         }
 

@@ -10,6 +10,7 @@ namespace Dsw2025Tpi.Application.Interfaces
 {
     public interface ICustomersManagementService
     {
+        Task<IEnumerable<CustomerModel.CustomerResponse>> GetCustomers();
         Task<CustomerModel.CustomerResponse?> GetCustomerById(Guid id);
         Task<CustomerModel.CustomerResponse> CreateCustomer(CustomerModel.CreateCustomerRequest request);
         Task<Customer?> GetCustomerByUserId(string userId);

@@ -20,15 +20,17 @@ public class OrdersController : ControllerBase
         _service = service;
     }
 
-    [HttpGet()]
-    public async Task<IActionResult> GetOrders()
+    [HttpGet("admin")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> GetOrders([FromQuery] OrderModel.FilterOrderRequest request)
     {
-        var orders = await _service.GetOrders();
-        if (orders == null || !orders.Any()) return NoContent();
+        var orders = await _service.GetOrders(request);
+        if (orders == null) return NoContent();
         return Ok(orders);
     }
 
     [HttpGet("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetOrderById(Guid id)
     {
         var order = await _service.GetOrderById(id);
@@ -37,6 +39,7 @@ public class OrdersController : ControllerBase
     }
 
     [HttpPost()]
+    [Authorize]
     public async Task<IActionResult> CreateOrder([FromBody] OrderModel.OrderRequest request)
     {
         var order = await _service.CreateOrder(request);

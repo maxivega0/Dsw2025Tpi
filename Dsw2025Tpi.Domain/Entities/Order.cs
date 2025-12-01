@@ -16,6 +16,7 @@ namespace Dsw2025Tpi.Domain.Entities
             //ShippingAddress = shippingAddress;
             //BillingAddress = billingAddress;
             //Notes = notes;
+            IsActive = true;
         }
         public DateTime Date { get; set; } = DateTime.UtcNow;
         public string? ShippingAddress { get; set; }
@@ -24,7 +25,7 @@ namespace Dsw2025Tpi.Domain.Entities
         public decimal TotalAmount => OrderItems?.Sum(item => item.Subtotal) ?? 0;
 
         public OrderStatus Status { get; set; } = OrderStatus.Pending;
-
+        public bool IsActive { get; set; }
         public Guid CustomerId { get; set; }
         public Customer? Customer { get; set; }
 
