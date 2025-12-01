@@ -8,7 +8,7 @@ namespace Dsw2025Tpi.Domain.Entities
 {
     public class Product : EntityBase
     {
-        public Product(string sku, string internalCode, string name, string description, decimal currentUnitPrice, int stockQuantity)
+        public Product(string sku, string internalCode, string name, string description, decimal currentUnitPrice, int stockQuantity, string image)
         {
             Sku = sku;
             InternalCode = internalCode;
@@ -16,6 +16,7 @@ namespace Dsw2025Tpi.Domain.Entities
             Description = description;
             CurrentUnitPrice = currentUnitPrice;
             StockQuantity = stockQuantity;
+            Image = image;
             IsActive = true;
         }
 
@@ -25,6 +26,7 @@ namespace Dsw2025Tpi.Domain.Entities
         public string? Description { get; set; }
         public decimal CurrentUnitPrice { get; set; }
         public int StockQuantity { get; set; }
+        public string Image {  get; set; }
         public bool IsActive { get; set; }
 
         public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();

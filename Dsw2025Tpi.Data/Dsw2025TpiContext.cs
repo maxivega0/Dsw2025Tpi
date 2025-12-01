@@ -30,6 +30,9 @@ public class Dsw2025TpiContext : DbContext
             eb.Property(p => p.StockQuantity)
             .HasConversion<int>()
             .IsRequired();
+            eb.Property(p => p.Image)
+            .HasMaxLength(250)
+            .IsRequired();
 
         });
         

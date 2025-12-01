@@ -6,6 +6,7 @@
     "description": "Monitor Full HD con panel IPS y entradas HDMI y VGA.",
     "currentUnitPrice": 199.99,
     "stockQuantity": 50,
+    "image": "https://images.fravega.com/f300/8031abdb207aba0abde82f633ae68e27.png.webp",
     "isActive": true
   },
   {
@@ -15,6 +16,7 @@
     "description": "Teclado mecánico con retroiluminación RGB y switches rojos.",
     "currentUnitPrice": 89.99,
     "stockQuantity": 120,
+    "image": "https://spacegamer.com.ar/img/Public/1058-producto-teclado-mecanico-redragon-vata-pro-rgb-8723.jpg",
     "isActive": true
   },
   {
@@ -24,6 +26,7 @@
     "description": "Mouse óptico de alta precisión con 6 botones programables.",
     "currentUnitPrice": 39.99,
     "stockQuantity": 200,
+    "image": "https://mexx-img-2019.s3.amazonaws.com/Mouse-Gamer-Logitech-G203-Lightsync-Negro_38349_2.jpeg",
     "isActive": true
   },
   {
@@ -33,6 +36,7 @@
     "description": "Unidad de estado sólido de 1TB con interfaz SATA III.",
     "currentUnitPrice": 129.99,
     "stockQuantity": 75,
+    "image": "https://smarttucuman.com/img/Public/1130/67256-producto-kingston-1tb-pcie-nvme.jpg",
     "isActive": true
   },
   {
@@ -42,6 +46,7 @@
     "description": "Memoria DDR4 de 16GB a 3200MHz.",
     "currentUnitPrice": 69.99,
     "stockQuantity": 100,
+    "image": "https://spacegamer.com.ar/img/Public/1058/producto-2-4747.jpg",
     "isActive": true
   },
   {
@@ -51,6 +56,7 @@
     "description": "Placa madre compatible con procesadores Intel de 12va gen.",
     "currentUnitPrice": 159.99,
     "stockQuantity": 40,
+    "image": "https://www.maximus.com.ar/Temp/App_WebSite/App_PictureFiles/Items/9MA52MK2-00-G11_600.jpg",
     "isActive": true
   },
   {
@@ -60,6 +66,7 @@
     "description": "Fuente certificada 80+ Bronze con ventilador silencioso.",
     "currentUnitPrice": 89.00,
     "stockQuantity": 65,
+    "image": "https://spacegamer.com.ar/img/Public/1058-producto-concepto-4917618-2473.jpg",
     "isActive": true
   },
   {
@@ -69,6 +76,7 @@
     "description": "Gabinete con ventana lateral de vidrio templado y RGB frontal.",
     "currentUnitPrice": 74.50,
     "stockQuantity": 55,
+    "image": "https://mexx-img-2019.s3.amazonaws.com/Gabinete-Mid-Tower-Gamemax-Prism-3-Fan-Argb_49305_1.jpeg",
     "isActive": true
   },
   {
@@ -78,6 +86,7 @@
     "description": "Sistema de refrigeración líquida para CPU con radiador de 240mm.",
     "currentUnitPrice": 110.00,
     "stockQuantity": 35,
+    "image": "https://www.maximus.com.ar/Temp/App_WebSite/App_PictureFiles/Items/MLW-D24M-A18PA-R1_600.jpg",
     "isActive": true
   },
   {
@@ -87,6 +96,7 @@
     "description": "Tarjeta gráfica NVIDIA RTX 3060 con 12GB GDDR6.",
     "currentUnitPrice": 379.99,
     "stockQuantity": 25,
+    "image": "https://smarttucuman.com/img/Public/1130/22291-producto-msi-rtx-3060-12gb-ventuss.jpeg",
     "isActive": true
   }
 ]

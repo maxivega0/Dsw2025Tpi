@@ -33,6 +33,7 @@ namespace Dsw2025Tpi.Application.Services
                     product.Description, 
                     product.CurrentUnitPrice, 
                     product.StockQuantity,
+                    product.Image,
                     product.IsActive
                     ) :
                 null;
@@ -57,6 +58,7 @@ namespace Dsw2025Tpi.Application.Services
                      p.Description,
                      p.CurrentUnitPrice,
                      p.StockQuantity,
+                     p.Image,
                      p.IsActive
                  ))
                  .OrderBy(p => p.Sku)
@@ -90,6 +92,7 @@ namespace Dsw2025Tpi.Application.Services
                      p.Description,
                      p.CurrentUnitPrice,
                      p.StockQuantity,
+                     p.Image,
                      p.IsActive
                  ))
                  .OrderBy(p => p.Sku)
@@ -111,7 +114,7 @@ namespace Dsw2025Tpi.Application.Services
 
             var exist = await _productRepository.First<Product>(p => p.Sku == request.Sku || p.InternalCode == request.InternalCode);
             if (exist != null) throw new DuplicatedEntityException("Ya existe un producto con el mismo SKU o código interno");
-            var product = new Product(request.Sku, request.InternalCode, request.Name, request.Description, request.CurrentUnitPrice, request.StockQuantity);
+            var product = new Product(request.Sku, request.InternalCode, request.Name, request.Description, request.CurrentUnitPrice, request.StockQuantity, request.Image);
             await _productRepository.Add(product);
             return new ProductModel.ProductResponse(
                 product.Id, 
@@ -121,6 +124,7 @@ namespace Dsw2025Tpi.Application.Services
                 product.Description, 
                 product.CurrentUnitPrice, 
                 product.StockQuantity,
+                product.Image,
                 product.IsActive
                 );
         }
@@ -153,6 +157,7 @@ namespace Dsw2025Tpi.Application.Services
                     product.Description, 
                     product.CurrentUnitPrice, 
                     product.StockQuantity,
+                    product.Image,
                     product.IsActive
                     );
             }
@@ -174,6 +179,7 @@ namespace Dsw2025Tpi.Application.Services
                 product.Description, 
                 product.CurrentUnitPrice, 
                 product.StockQuantity,
+                product.Image,
                 product.IsActive
                 );
 
