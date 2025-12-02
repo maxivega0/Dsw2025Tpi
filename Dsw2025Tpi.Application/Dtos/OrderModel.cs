@@ -16,7 +16,7 @@ namespace Dsw2025Tpi.Application.Dtos
         public record OrderResponse(Guid Id, Guid CustomerId, string CustomerName /*string? ShippingAddress, string? BillingAddress,*/, decimal TotalAmount, DateTime? Date, string Status, bool IsActive, ICollection<OrderItemModel.Response> OrderItems);
         public record PaginationResponse(List<OrderResponse> Orders, int Total);
         public record FilterOrderRequest(string? Status, string? Search, int PageNumber, int? PageSize);
-
-
+        public record OrderStatusRequest(OrderStatus Status);
+        public record OrderStatusResponse(Guid Id, Guid CustomerId, string Status);
     }
 }

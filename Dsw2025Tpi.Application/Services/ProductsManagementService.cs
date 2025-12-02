@@ -1,27 +1,33 @@
 ﻿using Dsw2025Tpi.Application.Dtos;
-using Dsw2025Tpi.Domain.Interfaces;
+using Dsw2025Tpi.Application.Exceptions;
+using Dsw2025Tpi.Application.Helpers;
+using Dsw2025Tpi.Application.Interfaces;
 using Dsw2025Tpi.Domain.Entities;
+using Dsw2025Tpi.Domain.Interfaces;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Dsw2025Tpi.Application.Exceptions;
-using Dsw2025Tpi.Application.Helpers;
-using Dsw2025Tpi.Application.Interfaces;
 
 namespace Dsw2025Tpi.Application.Services
 {
     public class ProductsManagementService : IProductsManagementService
     {
         private readonly IRepository _productRepository;
-        public ProductsManagementService(IRepository productRepository)
+        public readonly ILogger<IProductsManagementService> _logger;
+        public ProductsManagementService(IRepository productRepository,
+            ILogger<IProductsManagementService> logger)
         {
             _productRepository = productRepository;
+            _logger = logger;
+
         }
 
         public async Task<ProductModel.ProductResponse?> GetProductById(Guid id)
         {
+            _logger.LogInformation("Consulta de producto por id: {id}", id);
             var product = await _productRepository.GetById<Product>(id);
 
             return product != null && product.IsActive ?
@@ -41,6 +47,8 @@ namespace Dsw2025Tpi.Application.Services
 
         public async Task<ProductModel.PaginationResponse> GetProducts(ProductModel.FilterProductRequest request)
         {
+            _logger.LogInformation("Consulta de productos sin autentificacion");
+
             var isActive = true;
 
             var activeProducts = await _productRepository.GetFiltered<Product>(p => (
@@ -72,6 +80,7 @@ namespace Dsw2025Tpi.Application.Services
 
         public async Task<ProductModel.PaginationResponse> GetAuthProducts(ProductModel.FilterProductRequest request)
         {
+            _logger.LogInformation("Consulta de productos con autentificacion");
             var isActive = request.Status == "enabled" 
                 ? (bool?)true 
                 : request.Status == "disabled" 
@@ -106,6 +115,7 @@ namespace Dsw2025Tpi.Application.Services
 
         public async Task<ProductModel.ProductResponse> AddProduct(ProductModel.ProductRequest request)
         {
+            _logger.LogInformation("Creacion de producto");
             if (string.IsNullOrWhiteSpace(request.Sku)) throw new ArgumentException("El Sku no puede estar vacío.");
             if (string.IsNullOrWhiteSpace(request.InternalCode)) throw new ArgumentException("El código interno no puede estar vacío.");
             if (string.IsNullOrWhiteSpace(request.Name)) throw new ArgumentException("El Name no puede estar vacío.");
@@ -131,6 +141,7 @@ namespace Dsw2025Tpi.Application.Services
 
         public async Task<ProductModel.ProductResponse> UpdateProduct(Guid id, ProductModel.ProductRequest request)
         {
+            _logger.LogInformation("Actualizacion de producto con id: {id}", id);
             if (string.IsNullOrWhiteSpace(request.Sku)) throw new ArgumentException("El Sku no puede estar vacío.");
             if (string.IsNullOrWhiteSpace(request.InternalCode)) throw new ArgumentException("El código interno no puede estar vacío.");
             if (string.IsNullOrWhiteSpace(request.Name)) throw new ArgumentException("El Name no puede estar vacío.");
@@ -167,6 +178,7 @@ namespace Dsw2025Tpi.Application.Services
 
         public async Task<ProductModel.ProductResponse> DisableProduct(Guid id)
         {
+            _logger.LogInformation("Deshabilitacion de producto con id: {id}", id);
             var product = await _productRepository.GetById<Product>(id);
             if (product == null || !product.IsActive) throw new EntityNotFoundException("No existe un producto con el ID especificado");
             product.IsActive = false;

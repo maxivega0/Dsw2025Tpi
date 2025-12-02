@@ -9,10 +9,9 @@ namespace Dsw2025Tpi.Application.Interfaces
 {
     public interface IOrdersManagementService
     {
-        //Task<IEnumerable<OrderModel.OrderResponse>?> GetOrders();
         Task<OrderModel.OrderResponse?> GetOrderById(Guid id);
         Task<OrderModel.CreateResponse> CreateOrder(OrderModel.OrderRequest request);
-
         Task<OrderModel.PaginationResponse?> GetOrders(OrderModel.FilterOrderRequest request);
+        Task<OrderModel.OrderStatusResponse> UpdateOrderStatus(Guid id, OrderModel.OrderStatusRequest request);
     }
 }

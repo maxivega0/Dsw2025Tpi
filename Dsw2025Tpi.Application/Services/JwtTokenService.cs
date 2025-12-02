@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -13,12 +14,16 @@ namespace Dsw2025Tpi.Application.Services
     public class JwtTokenService
     {
         private readonly IConfiguration _config;
-        public JwtTokenService(IConfiguration config) 
+        private readonly ILogger<JwtTokenService> _logger;
+        public JwtTokenService(IConfiguration config,
+            ILogger<JwtTokenService> logger) 
         { 
             _config = config;
+            _logger = logger;
         }
         public string GenerateToken(string username, string role)
         {
+            _logger.LogInformation("Generacion de jwt");
             var jwtConfig = _config.GetSection("Jwt");
             var keyText = jwtConfig["Key"] ?? throw new ArgumentException("JWT Key");
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(keyText));

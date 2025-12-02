@@ -46,4 +46,11 @@ public class OrdersController : ControllerBase
         return Ok(order);
     }
 
+    [HttpPut("{id}/status")]
+    public async Task<IActionResult> UpdateOrderStatus(Guid id, [FromBody] OrderModel.OrderStatusRequest request)
+    {
+        var product = await _service.UpdateOrderStatus(id, request);
+        return Ok(product);
+    }
+
 }

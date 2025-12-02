@@ -1,9 +1,11 @@
 ﻿using Dsw2025Tpi.Application.Dtos;
 using Dsw2025Tpi.Application.Exceptions;
+using Dsw2025Tpi.Application.Helpers;
 using Dsw2025Tpi.Application.Interfaces;
 using Dsw2025Tpi.Domain.Entities;
 using Dsw2025Tpi.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,18 +19,23 @@ namespace Dsw2025Tpi.Application.Services
         public readonly IRepository _orderRepository;
         private readonly ICustomersManagementService _customersManagementService;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly ILogger<IProductsManagementService> _logger;
+
 
         public OrdersManagementService(IRepository orderRepository, 
             ICustomersManagementService customersManagementService, 
-            UserManager<IdentityUser> userManager)
+            UserManager<IdentityUser> userManager,
+            ILogger<IProductsManagementService> logger)
         {
             _orderRepository = orderRepository;
             _customersManagementService = customersManagementService;
             _userManager = userManager;
+            _logger = logger;
         }
 
         public async Task<OrderModel.PaginationResponse?> GetOrders(OrderModel.FilterOrderRequest request)
         {
+            _logger.LogInformation("Consulta de ordenes");
             var isActive = request.Status == "enabled"
                 ? (bool?)true
                 : request.Status == "disabled"
@@ -43,7 +50,6 @@ namespace Dsw2025Tpi.Application.Services
 
             var customers = await _customersManagementService.GetCustomers();
 
-            // Combinar datos + filtrar en memoria
             var filtered = orders
                 .Select(o =>
                 {
@@ -88,6 +94,7 @@ namespace Dsw2025Tpi.Application.Services
 
         public async Task<OrderModel.OrderResponse?> GetOrderById(Guid id)
         {
+            _logger.LogInformation("Consulta de orden por id: {id}", id);
             var order = await _orderRepository.GetById<Order>(id, $"{nameof(Order.OrderItems)}.{nameof(OrderItem.Product)}");
             var customer = await _customersManagementService.GetCustomerById(order.CustomerId);
             
@@ -115,6 +122,7 @@ namespace Dsw2025Tpi.Application.Services
 
         public async Task<OrderModel.CreateResponse?> CreateOrder(OrderModel.OrderRequest request)
         {
+            _logger.LogInformation("Creacion de orden");
             //if (string.IsNullOrWhiteSpace(request.ShippingAddress)) throw new ArgumentException("La dirección de envío no puede estar vacía.");
             //if (string.IsNullOrWhiteSpace(request.BillingAddress)) throw new ArgumentException("La dirección de facturación no puede estar vacía.");
             if (request.OrderItems == null || !request.OrderItems.Any()) throw new ArgumentException("La orden debe contener al menos un producto.");
@@ -163,6 +171,25 @@ namespace Dsw2025Tpi.Application.Services
                 createdOrder.Date,
                 createdOrder.Status,
                 createdOrder.OrderItems);
+        }
+
+        public async Task<OrderModel.OrderStatusResponse> UpdateOrderStatus(Guid id, OrderModel.OrderStatusRequest request)
+        {
+            _logger.LogInformation("Actualizacion de estado de orden con id: {id}", id);
+
+            var order = await _orderRepository.GetById<Order>(id);
+            if (order == null) throw new EntityNotFoundException("No existe una orden con el Id especificado");
+
+            order.Status = request.Status;
+            await _orderRepository.Update(order);
+            return new OrderModel.OrderStatusResponse(
+                order.Id,
+                order.CustomerId,
+                order.Status.ToString()
+                );
+
+            throw new ArgumentException("No se han modificado los valores del producto");
+
         }
 
     }

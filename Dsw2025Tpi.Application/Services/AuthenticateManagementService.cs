@@ -3,6 +3,7 @@ using Dsw2025Tpi.Application.Exceptions;
 using Dsw2025Tpi.Application.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,22 +19,26 @@ namespace Dsw2025Tpi.Application.Services
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly JwtTokenService _jwtTokenService;
         private readonly ICustomersManagementService _customersManagementService;
+        private readonly ILogger<IAuthenticateManagementService> _logger;
 
         public AuthenticateManagementService(UserManager<IdentityUser> userManager,
             RoleManager<IdentityRole> roleManager,
             SignInManager<IdentityUser> signInManager,
             JwtTokenService jwtTokenService,
-            ICustomersManagementService customersManagementService)
+            ICustomersManagementService customersManagementService,
+            ILogger<IAuthenticateManagementService> logger)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _signInManager = signInManager;
             _jwtTokenService = jwtTokenService;
             _customersManagementService = customersManagementService;
+            _logger = logger;
         }
 
         public async Task<LoginResponse> Login(LoginModel request)
         {
+            _logger.LogInformation("Logica para el inicio de sesion");
             var user = await _userManager.FindByNameAsync(request.Username);
             
             if (user == null)
@@ -52,6 +57,7 @@ namespace Dsw2025Tpi.Application.Services
 
         public async Task<RegisterResponse> Register(RegisterModel request)
         {
+            _logger.LogInformation("Logica para el registro de usuario");
             var userExists = await _userManager.FindByNameAsync(request.Username);
             if (userExists != null)
                 throw new DuplicatedEntityException("El usuario ya existe");
